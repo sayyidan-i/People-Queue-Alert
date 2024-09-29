@@ -42,18 +42,17 @@ out = cv2.VideoWriter(output_video_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (
 roi_x1, roi_y1, roi_x2, roi_y2 = 180, 50, 400, 300
 roi_box = [roi_x1, roi_y1, roi_x2, roi_y2]
 
-# Overlap threshold
-overlap_threshold = 0.5  # Only count a person if 50% of their bounding box overlaps with the ROI
-
 # Initialize variables for time counting
 person_count_threshold = 3
 alert_duration_seconds = 60  # Threshold for alert in seconds
 elapsed_time = 0  # Initialize elapsed time in seconds
 alert_displayed = False  # Flag to track if alert has been shown
+overlap_threshold = 0.5  # Only count a person if 50% or more of their bounding box overlaps with the ROI
 
 # Blinking variables
-blink_duration_frames = 20  # Number of frames between visibility toggles (change to adjust blink speed)
-frame_counter = 0  # Initialize frame counter
+blink_duration_frames = 20 
+frame_counter = 0
+
 # Frame miss detection tolerance variables for alert
 miss_detection_tolerance_frames = 60  # Allow up to 60 frames or 2 second of missed detections before resetting. 
 missed_detection_count_alert = 0  # Count of consecutive frames where person count falls below the threshold
@@ -89,11 +88,13 @@ while cap.isOpened():
                     cv2.putText(frame, "Person", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1)
 
     print(f"Person Count: {person_count}")
+    
     # Draw the ROI rectangle
     cv2.rectangle(frame, (roi_x1, roi_y1), (roi_x2, roi_y2), (255, 0, 0), 2)  # Draw ROI in blue
 
     # Display the count of people in the ROI
     count_text = f"People Queuing: {person_count}"
+    
     # Calculate text size for background
     (text_width, text_height), _ = cv2.getTextSize(count_text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
     cv2.rectangle(frame, (roi_x1, roi_y1 - text_height - 5), (roi_x1 + text_width, roi_y1), (0, 0, 255), -1)  # Background rectangle
@@ -115,6 +116,7 @@ while cap.isOpened():
 
     # Show elapsed time below the ROI
     elapsed_time_text = f"{elapsed_seconds} sec"
+    
     # Calculate text size for background
     (elapsed_text_width, elapsed_text_height), _ = cv2.getTextSize(elapsed_time_text, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
     cv2.rectangle(frame, (roi_x1, roi_y2 + 20 - elapsed_text_height - 10), 
